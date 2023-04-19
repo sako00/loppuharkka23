@@ -3,32 +3,43 @@
 //a. Tiedosto lisää uuden artistin, sekä lisäksi artistille albumin ja albumin kappaleet.
 //Kaikki tarvittavat tiedot saadaan joko POST- tai JSON-muodossa parametreina. Voit
 //aloittaa luomalla vain artistin ja albumin.
+
 require "dbconnection.php";
 $dbcon = createDbConnection();
 
-// Get the JSON data
+// Receive and decode the JSON data from the request body
 $body = file_get_contents("php://input");
 $data = json_decode($body);
 
-// Get the artist information
-$artistName = $data->artist_name;
-$artistSql = "INSERT INTO artists (Name) VALUES (?)";
-$artistStmt = $dbcon->prepare($artistSql);
-$artistStmt->execute([$artistName]);
+// Retrieve the artist name, album title, and track names from the decoded JSON data
+$artistName = strip_tags($data->artist);
+$albumTitle = strip_tags($data->album);
+$trackNames = $data->tracks;
 
-// Get the album information
-$albumTitle = $data->album_title;
-$albumArtistId = $dbcon->lastInsertId(); // The ID of the artist we just inserted
-$albumSql = "INSERT INTO albums (Title, ArtistId) VALUES (?, ?)";
-$albumStmt = $dbcon->prepare($albumSql);
-$albumStmt->execute([$albumTitle, $albumArtistId]);
-$albumId = $dbcon->lastInsertId(); // The ID of the album we just inserted
+// Insert the new artist into the artists table
+$sql = "INSERT INTO artists (Name) VALUES (?)";
+$statement = $dbcon->prepare($sql);
+$statement->execute(array($artistName));
 
-// Get the tracks information
-$tracks = $data->tracks;
-$trackSql = "INSERT INTO tracks (Name, AlbumId, MediaTypeId, GenreId, Composer,Milliseconds,Bytes,UnitPrice) VALUES (?, ?, ?, ?, ?, ? , ? , ?)";
-$trackStmt = $dbcon->prepare($trackSql);
-foreach ($tracks as $track) {
-    $trackStmt->execute([$track->name, $albumId, 
-    $track->media_type_id, $track->genre_id, $track->composer, $track->Milliseconds, $track->Bytes, $track->Unitprice]);
+// Retrieve the artist ID from the database
+$artistId = $dbcon->lastInsertId();
+
+// Insert the new album into the albums table
+$sql = "INSERT INTO albums (Title, ArtistId) VALUES (?,?)";
+$statement = $dbcon->prepare($sql);
+$statement->execute(array($albumTitle,$artistId));
+
+// Retrieve the album ID from the database
+$albumId = $dbcon->lastInsertId();
+
+// Loop through the track names and insert each track into the tracks table
+foreach ($trackNames as $trackName) {
+    $sql = "INSERT INTO tracks (Name, AlbumId, MediaTypeId, Milliseconds, UnitPrice) VALUES (?,?,?,?,?)";
+$statement = $dbcon->prepare($sql);
+$statement->execute(array($trackName, $albumId, 1, $milliseconds, $unitPrice));
+
 }
+
+echo "New artist and album created successfully!";
+?>
+

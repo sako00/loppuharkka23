@@ -36,7 +36,9 @@ foreach($rows as $row){
         $result["albums"][$album] = array();
     }
 
-    array_push($result["albums"][$album], $track);
+    // Add "Title" and "Track" keys to the result array
+    $result["albums"][$album]["Title"] = $album;
+    $result["albums"][$album]["Tracks"][] = array("Track" => $track);
 }
 
 // Tulosta tulos JSON-muodossa

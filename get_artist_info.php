@@ -36,7 +36,7 @@ foreach($rows as $row){
         $result["albums"][$album] = array();
     }
 
-    // Add "Title" and "Track" keys to the result array
+    //Lisää "Title"- ja "Track"-näppäimet tulosjonoon
     $result["albums"][$album]["Title"] = $album;
     $result["albums"][$album]["Tracks"][] = array("Track" => $track);
 }

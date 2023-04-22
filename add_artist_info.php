@@ -18,16 +18,34 @@ $data = json_decode($body);
 //$statement->execute(array($a->name));
     
 
-//Create a new album for the artist in the albums table
-$stmt = $dbcon->prepare("INSERT INTO albums (Title, ArtistId) VALUES (?, ?)");
-$stmt->execute(array($data->title, $data->artist_id));
-$album_id = $dbcon->lastInsertId();
 
-//Create a new track for the album in the tracks table
-$stmt = $dbcon->prepare("INSERT INTO tracks (Name, AlbumId, MediaTypeId, GenreId, Composer, Milliseconds, Bytes, UnitPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-$stmt->execute(array($data->track_name, $album_id, $data->media_type_id, $data->genre_id, $data->composer, $data->milliseconds, $data->bytes, $data->unit_price));
-$track_id = $dbcon->lastInsertId();
+$sql = "SELECT ArtistId FROM artists WHERE Name = ?";
+$statement = $dbcon->prepare($sql);
+$statement->execute(array("Popeda"));
+$result = $statement->fetch();
+$artistId = $result["ArtistId"];
 
-//Return a JSON response with information about the new album and track
-$response = array('album_id' => $album_id, 'track_id' => $track_id, 'album_title' => $data->title, 'track_name' => $data->track_name);
-echo json_encode($response);
+// Insert a new album for "Popeda"
+$sql = "INSERT INTO albums (Title, ArtistId) VALUES (?, ?)";
+$statement = $dbcon->prepare($sql);
+$statement->execute(array($data->albumTitle, $artistId));
+$albumId = $dbcon->lastInsertId();
+
+
+$mediaTypeId = 1;
+$genreId = 2;
+$composer = "John Doe";
+$milliseconds = 1000;
+$bytes = 500000;
+$unitPrice = 0.99;
+
+$sql = "INSERT INTO tracks (Name, AlbumId, MediaTypeId, GenreId, Composer, Milliseconds, Bytes, UnitPrice) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+$statement = $dbcon->prepare($sql);
+$statement->execute(array("Track name", $albumId, $mediaTypeId, $genreId, $composer, $milliseconds, $bytes, $unitPrice));
+
+
+
+
+
+

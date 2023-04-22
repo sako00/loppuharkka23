@@ -8,7 +8,7 @@
 require "dbconnection.php";
 $dbcon = createDbConnection();
 
-$artist_id = 2;
+$artist_id = 51;
 
 // SQL-kysely artistin tiedoille
 $sql = "SELECT Name FROM artists WHERE ArtistId = $artist_id";
@@ -28,13 +28,10 @@ $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 // Muodosta tulos array
 $result = array("artist" => $artist_name, "albums" => array());
 
-foreach($rows as $row){
+foreach ($rows as $row) {
     $album = $row["AlbumTitle"];
     $track = $row["TrackName"];
 
-    if(!isset($result["albums"][$album])){
-        $result["albums"][$album] = array();
-    }
 
     //Lisää "Title"- ja "Track"-näppäimet tulosjonoon
     $result["albums"][$album]["Title"] = $album;

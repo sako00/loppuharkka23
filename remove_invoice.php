@@ -9,10 +9,10 @@ require "dbconnection.php";
 $dbcon = createDbConnection();
 
 // invoice_id muuttuja
-$invoice_id = 1; // Korvaa tämä tiedon oikealla ID:llä
+$invoice_item_id = 9; // Korvaa tämä tiedon oikealla ID:llä
 
 // SQL DELETE-lauseke
-$sql = "DELETE FROM invoice_items WHERE InvoiceId = $invoice_id";
+$sql = "DELETE FROM invoice_items WHERE InvoiceLineId = $invoice_item_id";
 
 $statement = $dbcon->prepare($sql);
 $statement->execute();

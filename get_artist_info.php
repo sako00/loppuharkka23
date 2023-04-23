@@ -34,8 +34,8 @@ foreach ($rows as $row) {
 
 
     //Lisää "Title"- ja "Track"-näppäimet tulosjonoon
-    $result["albums"][$album]["Title"] = $album;
-    $result["albums"][$album]["Tracks"][] = array("Track" => $track);
+    $result["albums"]["Title"] = $album;
+    $result["albums"][$album]["Tracks"][] = array($track);
 }
 
 // Tulosta tulos JSON-muodossa

@@ -18,34 +18,44 @@ $data = json_decode($body);
 //$statement->execute(array($a->name));
     
 
-
-$sql = "SELECT ArtistId FROM artists WHERE Name = ?";
-$statement = $dbcon->prepare($sql);
-$statement->execute(array("Popeda"));
-$result = $statement->fetch();
-$artistId = $result["ArtistId"];
-
-// Insert a new album for "Popeda"
-$sql = "INSERT INTO albums (Title, ArtistId) VALUES (?, ?)";
-$statement = $dbcon->prepare($sql);
-$statement->execute(array($data->albumTitle, $artistId));
-$albumId = $dbcon->lastInsertId();
-
-
-$mediaTypeId = 1;
-$genreId = 2;
-$composer = "John Doe";
-$milliseconds = 1000;
-$bytes = 500000;
-$unitPrice = 0.99;
-
-$sql = "INSERT INTO tracks (Name, AlbumId, MediaTypeId, GenreId, Composer, Milliseconds, Bytes, UnitPrice) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-$statement = $dbcon->prepare($sql);
-$statement->execute(array("Track name", $albumId, $mediaTypeId, $genreId, $composer, $milliseconds, $bytes, $unitPrice));
-
-
-
-
-
-
+// Check if all required data is present
+if (!isset($data->title) || !isset($data->artist_id) || !isset($data->trackNames) || !isset($data->mediatypeId) || !isset($data->milliseconds) || !isset($data->unitprice)) {
+        // Return an error message if any required data is missing
+        http_response_code(400);
+        echo json_encode(array("error" => "Missing required data"));
+        exit();
+    }
+    
+    // Insert the album into the database
+    $stmt = $dbcon->prepare("INSERT INTO albums (Title, ArtistId) VALUES (?, ?)");
+    $stmt->execute(array($data->title, $data->artist_id));
+    $album_id = $dbcon->lastInsertId();
+    
+    // Insert each track into the database
+    foreach ($data->trackNames as $trackName) {
+        $statement = $dbcon->prepare("INSERT INTO tracks (Name, AlbumId, MediaTypeId, Milliseconds, UnitPrice) VALUES (?, ?, ?, ?, ?)");
+        $statement->execute(array($trackName, $album_id, $data->mediatypeId, $data->milliseconds, $data->unitprice));
+        $track_id = $dbcon->lastInsertId();
+    }
+    
+    //{
+      //  "artistName": "Popeda",
+        //"artist_id":1,
+        //"title": "Kaasua, komisario Palmu!",
+        //"trackNames": [
+          //  "Hullun paperit",
+            //"Hän",
+            //"Odotusaika",
+            //"Kersantti Karoliina",
+            //"Vielä virtaa",
+            //"Vauhtiajot",
+            //"Sukset",
+            //"Korkeajännitystä",
+            //"Oi Mari",
+            //"Matkalla Alabamaan"
+        //],
+        //"mediatypeId":1,
+        //"milliseconds":123456,
+        //"unitprice":0.99
+    //}
+    
